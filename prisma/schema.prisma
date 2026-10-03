@@ -1,0 +1,12 @@
+// Prisma schema — https://pris.ly/d/prisma-schema
+// Connection URL is configured in prisma7.config.ts.
+// Better Auth models can be generated with: npm run auth:generate
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
