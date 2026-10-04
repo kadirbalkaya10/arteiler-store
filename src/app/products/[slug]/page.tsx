@@ -5,24 +5,21 @@ import { notFound } from "next/navigation";
 import { ProductGrid } from "@/components/home/product-showcase";
 import { AddToBag } from "@/components/product/add-to-bag";
 import { StockStatus } from "@/components/product/stock-status";
-import {
-  formatPrice,
-  getCollection,
-  getProduct,
-  getRelatedProducts,
-  getStockState,
-  products,
-  services,
-} from "@/lib/catalog";
+import { formatPrice, getStockState, services } from "@/lib/catalog";
+import { getProduct, getProductSlugs, getRelatedProducts } from "@/lib/products";
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+/** Re-read price and stock from the database at most once a minute. */
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const slugs = await getProductSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/products/[slug]">): Promise<Metadata> {
-  const product = getProduct((await params).slug);
+  const product = await getProduct((await params).slug);
   if (!product) return {};
 
   return {
@@ -33,12 +30,12 @@ export async function generateMetadata({
 }
 
 export default async function ProductPage({ params }: PageProps<"/products/[slug]">) {
-  const product = getProduct((await params).slug);
+  const product = await getProduct((await params).slug);
   if (!product) notFound();
 
-  const category = getCollection(product.category);
+  const { category } = product;
   const stock = getStockState(product.stock);
-  const related = getRelatedProducts(product);
+  const related = await getRelatedProducts(product);
 
   return (
     <>
@@ -49,14 +46,12 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
               Home
             </Link>
           </li>
-          {category && (
-            <li className="flex gap-2">
-              <span aria-hidden="true">/</span>
-              <Link href={`/collections/${category.slug}`} className="link-quiet">
-                {category.name}
-              </Link>
-            </li>
-          )}
+          <li className="flex gap-2">
+            <span aria-hidden="true">/</span>
+            <Link href={`/collections/${category.slug}`} className="link-quiet">
+              {category.name}
+            </Link>
+          </li>
           <li className="flex gap-2">
             <span aria-hidden="true">/</span>
             <span aria-current="page" className="text-foreground">
@@ -87,14 +82,12 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
         <div className="lg:col-span-4 lg:col-start-9">
           <div className="flex flex-col gap-8 lg:sticky lg:top-32">
             <div className="flex flex-col gap-3">
-              {category && (
-                <Link
-                  href={`/collections/${category.slug}`}
-                  className="link-quiet w-fit type-eyebrow text-muted"
-                >
-                  {category.name}
-                </Link>
-              )}
+              <Link
+                href={`/collections/${category.slug}`}
+                className="link-quiet w-fit type-eyebrow text-muted"
+              >
+                {category.name}
+              </Link>
               <h1 className="type-title-l">{product.name}</h1>
               <p className="type-body text-muted">{product.detail}</p>
               <p className="type-body-strong">{formatPrice(product.price)}</p>
@@ -134,8 +127,8 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
             eyebrow="Complete the look"
             title="You may also like"
             action={{
-              label: `Shop ${category?.name ?? "all"}`,
-              href: `/collections/${category?.slug ?? "new-in"}`,
+              label: `Shop ${category.name}`,
+              href: `/collections/${category.slug}`,
             }}
             products={related}
           />
