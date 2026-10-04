@@ -10,3 +10,47 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum ProductBadge {
+  NEW_IN
+  LIMITED
+  BESTSELLER
+}
+
+model Category {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  name          String
+  tagline       String
+  imageUrl      String
+  imageAlt      String
+  /// CSS object-position, to keep the subject in frame when cropped
+  imagePosition String?
+  sortOrder     Int       @default(0)
+  products      Product[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Product {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  name          String
+  /// Short line under the name, e.g. "Grained calf, teal"
+  detail        String
+  description   String
+  details       String[]
+  priceCents    Int
+  /// Units available; 0 means sold out
+  stock         Int           @default(0)
+  badge         ProductBadge?
+  imageUrl      String
+  imageAlt      String
+  imagePosition String?
+  categoryId    String
+  category      Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([categoryId])
+}
