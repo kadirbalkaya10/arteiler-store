@@ -3,17 +3,19 @@ import { CampaignBanner, StorySplit } from "@/components/home/editorial";
 import { Hero } from "@/components/home/hero";
 import { ProductGrid, ProductRail } from "@/components/home/product-showcase";
 import { Newsletter, ServicesStrip } from "@/components/home/services";
-import {
-  campaign,
-  collections,
-  giftEdit,
-  hero,
-  newArrivals,
-  services,
-  stories,
-} from "@/lib/catalog";
+import { campaign, GIFT_EDIT_SLUGS, hero, services, stories } from "@/lib/catalog";
+import { getCategories, getNewArrivals, getProductsBySlugs } from "@/lib/products";
 
-export default function Home() {
+/** Re-read products and stock from the database at most once a minute. */
+export const revalidate = 60;
+
+export default async function Home() {
+  const [collections, newArrivals, giftEdit] = await Promise.all([
+    getCategories(),
+    getNewArrivals(),
+    getProductsBySlugs(GIFT_EDIT_SLUGS),
+  ]);
+
   return (
     <>
       <Hero story={hero} />
