@@ -19,6 +19,7 @@ npm run lint           # ESLint (flat config, eslint.config.mjs)
 npm run db:generate    # regenerate Prisma Client (also runs on postinstall)
 npm run db:migrate     # prisma migrate dev — create/apply migrations
 npm run db:studio      # Prisma Studio
+npm run db:seed        # upsert sample categories + products (prisma/seed.ts)
 npm run auth:generate  # write Better Auth models into prisma/schema.prisma
 ```
 
@@ -31,6 +32,19 @@ No test framework is configured yet.
 - **Prisma config** — `prisma7.config.ts` (non-default filename, but the CLI loads it). It loads `.env` via `dotenv` and points the CLI at the **direct** (non-pooled) `DIRECT_URL` for migrations, falling back to `DATABASE_URL`. The datasource block in `schema.prisma` intentionally has no `url`.
 - **Auth** — `src/lib/auth.ts` is the server-side Better Auth instance (Prisma adapter, `nextCookies()` plugin must stay last in `plugins`). It is mounted as a catch-all route at `src/app/api/auth/[...all]/route.ts`. `src/lib/auth-client.ts` is the React client, using `NEXT_PUBLIC_APP_URL`.
 - **Auth schema workflow** — Better Auth's tables (user, session, account, verification) are not in `schema.prisma` yet. When changing auth config/plugins: `npm run auth:generate` → `npm run db:migrate` → `npm run db:generate` (Prisma 7's `migrate dev` no longer generates the client automatically).
+
+## Database conventions
+
+- **Scope**: the catalog is only `Category 1─* Product`. Don't add carts, orders, payments, reviews, wishlists or variants unless asked.
+- **Data access**: components and pages never import `prisma` directly. Catalog queries live in `src/lib/products.ts` (`server-only`), which maps rows to the UI types in `src/lib/catalog.ts`. Wrap queries called by both `generateMetadata` and the page in React `cache()`.
+- **Money**: store integer cents (`priceCents`), never floats. Convert to display units only in the mapper.
+- **Stock**: a `stock Int` column on `Product`, where 0 means sold out. It moves to a variant table only once variants exist.
+- **Identifiers**: `slug` is the unique public key used in URLs and lookups. `id` is an internal cuid.
+- **Enums**: values are UPPER_SNAKE in the DB (e.g. `ProductBadge.NEW_IN`). Map them to display labels in the mapper.
+- **Editorial content stays in code**: hero, stories, navigation and curated picks (e.g. `GIFT_EDIT_SLUGS`) are not DB data.
+- **Constraints**: CHECKs that Prisma can't express (`stock >= 0`, `priceCents >= 0`) are hand-added to migration SQL. Keep them, and add new ones the same way.
+- **Seed**: `prisma/seed.ts` upserts by `slug` and must stay idempotent. Write optional fields as explicit `null`, because Prisma skips `undefined` on update.
+- **Caching**: catalog pages use `export const revalidate = 60`, so `npm run build` needs a reachable `DATABASE_URL`.
 
 ## Environment
 
