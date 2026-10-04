@@ -1,0 +1,140 @@
+/*
+ * Responsive layout primitives.
+ *
+ * Breakpoints: base (phone) → md 768 → lg 1024 → xl 1440.
+ * Side gutters: 16 → 32 → 64px (--gutter). Content caps at 1440px;
+ * imagery may go full bleed.
+ */
+
+/* Standard page width: centered, capped at 1440px, with responsive gutters. */
+@utility container-page {
+  width: 100%;
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Full width with gutters and no cap: product grids, headers, footers. */
+@utility container-fluid {
+  width: 100%;
+  padding-inline: var(--gutter);
+}
+
+/* Reading width for editorial copy, policies, product descriptions. */
+@utility container-prose {
+  width: 100%;
+  max-width: var(--container-prose);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Narrow column for sign-in, checkout steps, newsletter forms. */
+@utility container-form {
+  width: 100%;
+  max-width: var(--container-form);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Vertical rhythm between page sections: 48 → 64 → 96px. */
+@utility section {
+  padding-block: var(--section);
+}
+
+/*
+ * 12-column grid with an 8px gap, for editorial layouts.
+ * Children place themselves with col-span-* / md:col-span-*.
+ */
+@utility layout-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+}
+
+/*
+ * Product listing grid: 2 → 3 → 4 columns, tight 8px column gap.
+ * Tiles carry their own bottom padding, so there is no row gap.
+ */
+@utility product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+
+  @media (min-width: 48rem) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (min-width: 64rem) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/*
+ * Image frame for product shots: fixed ratio, near-white backdrop,
+ * product contained (never cropped). Put a next/image with `fill` inside.
+ */
+@utility media-product {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--aspect-product);
+  background-color: var(--color-surface-media);
+
+  /* :where keeps this a default, so object-cover on the image wins */
+  :where(&) img {
+    object-fit: contain;
+  }
+}
+
+/* Image frame for campaign photography: cropped to fill, portrait on phones, wide from md. */
+@utility media-editorial {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--aspect-hero-mobile);
+  background-color: var(--color-surface-media);
+
+  :where(&) img,
+  :where(&) video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 48rem) {
+    aspect-ratio: var(--aspect-hero);
+  }
+}
+
+/* Product tile text block below the image */
+@utility product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 0.75rem 2rem;
+
+  @media (min-width: 64rem) {
+    padding: 1.5rem 1rem 2rem;
+  }
+}
+
+/* Breaks a child out of a container to the full viewport width. */
+@utility full-bleed {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+/* Sticky top bar: hairline bottom border, height from --header-height. */
+@utility header-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  border-bottom: 1px solid var(--color-divider);
+  background-color: var(--color-background);
+}
+
+/* Offsets scroll targets so sticky headers don't cover them. */
+@utility scroll-offset-header {
+  scroll-margin-top: var(--header-height);
+}

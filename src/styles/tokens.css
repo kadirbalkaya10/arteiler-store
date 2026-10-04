@@ -1,0 +1,125 @@
+/*
+ * Design tokens.
+ *
+ * Raw values live on :root so they can change per breakpoint or per
+ * theme scope (.theme-inverse). @theme exposes them to Tailwind as
+ * utilities: bg-background, text-muted, border-divider, px-gutter,
+ * py-section, ease-standard, etc.
+ */
+
+:root {
+  /* Color: monochrome first. Product imagery carries the color. */
+  --ink: #0a0a0a;
+  --paper: #ffffff;
+  --surface: #f6f6f5; /* quiet panels, footers, hover fills */
+  --surface-media: #f9f9f8; /* behind product photography */
+  --muted: #6b6b6b; /* secondary text, meets 4.5:1 on paper */
+  --subtle: #9a9a9a; /* placeholders, decorative text only */
+  --divider: rgb(10 10 10 / 0.14);
+  --divider-strong: rgb(10 10 10 / 0.32);
+  --scrim: rgb(10 10 10 / 0.4);
+  --disabled: #8a8a8a;
+  --focus: #2f6bff;
+  --danger: #b42318;
+  --success: #1f6b45;
+  --warning: #8a4b0f;
+
+  /* Layout */
+  --gutter: 1rem;
+  --section: 3rem;
+  --header-height: 3.5rem;
+  --grid-gap: 0.5rem;
+
+  /* Type: sizes that step up at lg */
+  --type-display: 2.5rem;
+  --type-title-xl: 2rem;
+  --type-title-l: 1.5rem;
+  --type-title-m: 1.25rem;
+  --type-title-s: 0.875rem;
+  --type-body-xl: 1.5rem;
+  --type-body-xl-leading: 2rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 2rem;
+    --section: 4rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --gutter: 4rem;
+    --section: 6rem;
+    --header-height: 4.5rem;
+
+    --type-display: 4rem;
+    --type-title-xl: 3rem;
+    --type-title-l: 2rem;
+    --type-title-m: 1.5rem;
+    --type-title-s: 1rem;
+    --type-body-xl: 2rem;
+    --type-body-xl-leading: 2.75rem;
+  }
+}
+
+/* Inverted scope: drop on any section to flip it to light-on-dark. */
+.theme-inverse {
+  --ink: #ffffff;
+  --paper: #0a0a0a;
+  --surface: #181818;
+  --surface-media: #141414;
+  --muted: #a3a3a3;
+  --subtle: #6f6f6f;
+  --divider: rgb(255 255 255 / 0.2);
+  --divider-strong: rgb(255 255 255 / 0.5);
+  --disabled: #6f6f6f;
+  --danger: #f2877e;
+  --success: #6fcf97;
+  --warning: #f0a35e;
+
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+@theme inline {
+  /* Breakpoints: md 768 / lg 1024 / xl 1440 drive every layout shift. */
+  --breakpoint-xl: 90rem;
+  --breakpoint-2xl: 120rem;
+
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-surface: var(--surface);
+  --color-surface-media: var(--surface-media);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-divider: var(--divider);
+  --color-divider-strong: var(--divider-strong);
+  --color-scrim: var(--scrim);
+  --color-disabled: var(--disabled);
+  --color-focus: var(--focus);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+
+  /* Named spacing on top of Tailwind's 4px scale */
+  --spacing-gutter: var(--gutter);
+  --spacing-section: var(--section);
+  --spacing-header: var(--header-height);
+  --spacing-grid: var(--grid-gap);
+
+  --container-page: 90rem;
+  --container-prose: 40rem;
+  --container-form: 28rem;
+
+  /* Corners are square; 2px is the only softening allowed. */
+  --radius-hairline: 2px;
+
+  --ease-standard: cubic-bezier(0.5, 0, 0, 1);
+
+  --aspect-product: 4 / 5;
+  --aspect-hero: 16 / 9;
+  --aspect-hero-mobile: 4 / 5;
+}

@@ -1,0 +1,187 @@
+/*
+ * Base element styles and the typography scale.
+ *
+ * Type rules:
+ * - One sans family. Hierarchy comes from size, weight and case,
+ *   never from a second typeface or color.
+ * - Large type is light (300) with tight tracking.
+ * - Small labels are medium or bold uppercase.
+ * - Body copy stays at 16px with 1.5 line height.
+ */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    letter-spacing: -0.02em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* clip (not hidden) so full-bleed media can't cause sideways scroll and sticky still works */
+    overflow-x: clip;
+  }
+
+  /* Headings carry no default look; pick a type-* utility. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-divider);
+  }
+
+  hr {
+    border-top-width: 1px;
+    border-color: var(--color-divider);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  video {
+    display: block;
+  }
+
+  ::selection {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Display and titles: uppercase, tight, light at large sizes. */
+@utility type-display {
+  font-size: var(--type-display);
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+@utility type-title-xl {
+  font-size: var(--type-title-xl);
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+@utility type-title-l {
+  font-size: var(--type-title-l);
+  line-height: 1.25;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+@utility type-title-m {
+  font-size: var(--type-title-m);
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+@utility type-title-s {
+  font-size: var(--type-title-s);
+  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* Small uppercase label: section kickers, badges, table headers. */
+@utility type-eyebrow {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Editorial lead paragraph */
+@utility type-body-xl {
+  font-size: var(--type-body-xl);
+  line-height: var(--type-body-xl-leading);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+}
+
+@utility type-body {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+@utility type-body-strong {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+/* Product names, prices, nav items, meta */
+@utility type-small {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+@utility type-small-strong {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* Legal lines, tiny badges. Never use for anything the user must read. */
+@utility type-micro {
+  font-size: 0.625rem;
+  line-height: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Button and CTA labels */
+@utility type-cta {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,268 @@
+/*
+ * Buttons, links and form fields.
+ *
+ * In @layer components so any Tailwind utility (w-auto, mt-4, ...)
+ * can override them without !important.
+ */
+
+@layer components {
+  /*
+   * Buttons: rectangular, 2px corners, uppercase label. Full width on
+   * phones, natural width from md up. The fill sits in ::before so on
+   * hover it can contract slightly while the label stays put.
+   */
+  .btn {
+    --btn-fill: var(--color-foreground);
+    --btn-line: var(--color-foreground);
+    --btn-label: var(--color-background);
+
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 3rem;
+    padding: 1rem 1.5rem;
+    border: 0;
+    background: transparent;
+    color: var(--btn-label);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: var(--radius-hairline);
+      background: var(--btn-fill);
+      box-shadow: inset 0 0 0 1px var(--btn-line);
+      transition: transform 600ms var(--ease-standard);
+    }
+
+    @media (hover: hover) {
+      &:hover::before {
+        transform: scale(0.97, 0.9);
+      }
+    }
+
+    &:focus-visible {
+      outline: none;
+    }
+
+    &:focus-visible::before {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    &:disabled,
+    &[aria-disabled="true"] {
+      cursor: not-allowed;
+
+      &::before {
+        transform: none;
+      }
+    }
+
+    @media (min-width: 48rem) {
+      width: auto;
+    }
+  }
+
+  .btn-primary {
+    --btn-fill: var(--color-foreground);
+    --btn-line: var(--color-foreground);
+    --btn-label: var(--color-background);
+
+    &:disabled,
+    &[aria-disabled="true"] {
+      --btn-fill: var(--color-disabled);
+      --btn-line: var(--color-disabled);
+    }
+  }
+
+  .btn-secondary {
+    --btn-fill: transparent;
+    --btn-line: var(--color-foreground);
+    --btn-label: var(--color-foreground);
+
+    &:disabled,
+    &[aria-disabled="true"] {
+      --btn-line: var(--color-disabled);
+      --btn-label: var(--color-disabled);
+    }
+  }
+
+  /* For use on top of photography; the frosted fill keeps the label legible. */
+  .btn-overlay {
+    --btn-fill: rgb(255 255 255 / 0.5);
+    --btn-line: #ffffff;
+    --btn-label: #0a0a0a;
+
+    &::before {
+      backdrop-filter: blur(12px);
+    }
+  }
+
+  .btn-sm {
+    min-height: 2.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Square icon-only button (search, bag, close). Needs an aria-label. */
+  .btn-icon {
+    width: 2.5rem;
+    min-height: 2.5rem;
+    padding: 0;
+  }
+
+  /*
+   * Links. Underlines are 1px, drawn with a background so they wrap
+   * across lines.
+   */
+
+  /* Inline link in running text: on hover the underline sweeps out and back. */
+  .link {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+    padding-bottom: 1px;
+
+    @media (hover: hover) {
+      &:hover {
+        animation: underline-sweep 700ms var(--ease-standard);
+      }
+    }
+  }
+
+  /* Standalone call to action ("Discover", "View all"). */
+  .link-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+    padding-bottom: 0.25rem;
+
+    @media (hover: hover) {
+      &:hover {
+        animation: underline-sweep 700ms var(--ease-standard);
+      }
+    }
+  }
+
+  /* Navigation, footer and filter links: no underline until hover or current page. */
+  .link-quiet {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0 1px;
+    padding-bottom: 1px;
+    transition: background-size 500ms var(--ease-standard);
+
+    &:hover,
+    &[aria-current="page"] {
+      background-size: 100% 1px;
+    }
+  }
+
+  /*
+   * Form fields: an underline, not a box. Keep 16px text so iOS
+   * doesn't zoom on focus.
+   */
+  .label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+
+  .input {
+    display: block;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--color-divider-strong);
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-foreground);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    transition:
+      border-color 300ms var(--ease-standard),
+      box-shadow 300ms var(--ease-standard);
+
+    &::placeholder {
+      color: var(--color-subtle);
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-bottom-color: var(--color-foreground);
+      box-shadow: 0 1px 0 0 var(--color-foreground);
+    }
+
+    &[aria-invalid="true"] {
+      border-bottom-color: var(--color-danger);
+    }
+
+    &:disabled {
+      color: var(--color-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  .field-hint {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-muted);
+  }
+
+  .field-error {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-danger);
+  }
+}
+
+@keyframes underline-sweep {
+  0% {
+    background-position: 100% 100%;
+    background-size: 100% 1px;
+  }
+  50% {
+    background-position: 100% 100%;
+    background-size: 0 1px;
+  }
+  50.01% {
+    background-position: 0 100%;
+    background-size: 0 1px;
+  }
+  100% {
+    background-position: 0 100%;
+    background-size: 100% 1px;
+  }
+}
