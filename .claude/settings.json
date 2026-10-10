@@ -1,9 +1,9 @@
 {
     "permissions": {
         "allow":[
-            "Bash(pnpm build)",
-            "Bash(pnpm test *)",
-            "Bash(pnpm typecheck)",
+            "Bash(npm build)",
+            "Bash(npm test *)",
+            "Bash(npm typecheck)",
             "Bash(git status)",
             "Bash(git diff)"
 
