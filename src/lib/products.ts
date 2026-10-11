@@ -60,6 +60,27 @@ export async function getCategories() {
 }
 
 /** Memoized per request: generateMetadata and the page both call it. */
+export const getCategory = cache(async (slug: string) => {
+  const row = await prisma.category.findUnique({ where: { slug } });
+  return row ? toCollection(row) : undefined;
+});
+
+export async function getCategorySlugs() {
+  const rows = await prisma.category.findMany({ select: { slug: true } });
+  return rows.map((row) => row.slug);
+}
+
+/** Products in a category, newest first. */
+export async function getProductsByCategory(slug: string) {
+  const rows = await prisma.product.findMany({
+    where: { category: { slug } },
+    include: productInclude,
+    orderBy: { createdAt: "desc" },
+  });
+  return rows.map(toProduct);
+}
+
+/** Memoized per request: generateMetadata and the page both call it. */
 export const getProduct = cache(async (slug: string) => {
   const row = await prisma.product.findUnique({ where: { slug }, include: productInclude });
   return row ? toProduct(row) : undefined;
