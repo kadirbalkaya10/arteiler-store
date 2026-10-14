@@ -21,6 +21,7 @@ npm run db:migrate     # prisma migrate dev — create/apply migrations
 npm run db:studio      # Prisma Studio
 npm run db:seed        # upsert sample categories + products (prisma/seed.ts)
 npm run auth:generate  # write Better Auth models into prisma/schema.prisma
+npm run auth:make-admin -- <email>  # give an existing user the admin role
 ```
 
 No test framework is configured yet.
@@ -31,7 +32,7 @@ No test framework is configured yet.
 - **Generated client** — Prisma 7 `prisma-client` generator outputs to `src/generated/prisma` (gitignored). Rerun `npm run db:generate` after any schema change.
 - **Prisma config** — `prisma7.config.ts` (non-default filename, but the CLI loads it). It loads `.env` via `dotenv` and points the CLI at the **direct** (non-pooled) `DIRECT_URL` for migrations, falling back to `DATABASE_URL`. The datasource block in `schema.prisma` intentionally has no `url`.
 - **Auth** — `src/lib/auth.ts` is the server-side Better Auth instance (Prisma adapter, `nextCookies()` plugin must stay last in `plugins`). It is mounted as a catch-all route at `src/app/api/auth/[...all]/route.ts`. `src/lib/auth-client.ts` is the React client, using `NEXT_PUBLIC_APP_URL`.
-- **Auth schema workflow** — Better Auth's tables (user, session, account, verification) are not in `schema.prisma` yet. When changing auth config/plugins: `npm run auth:generate` → `npm run db:migrate` → `npm run db:generate` (Prisma 7's `migrate dev` no longer generates the client automatically).
+- **Auth schema workflow** — Better Auth's tables (`user`, `session`, `account`, `verification`) are generated into `schema.prisma`. When changing auth config/plugins: `npm run auth:generate` → review the diff → `npm run db:migrate` → `npm run db:generate` (Prisma 7's `migrate dev` no longer generates the client automatically).
 
 ## Database conventions
 
@@ -45,6 +46,15 @@ No test framework is configured yet.
 - **Constraints**: CHECKs that Prisma can't express (`stock >= 0`, `priceCents >= 0`) are hand-added to migration SQL. Keep them, and add new ones the same way.
 - **Seed**: `prisma/seed.ts` upserts by `slug` and must stay idempotent. Write optional fields as explicit `null`, because Prisma skips `undefined` on update.
 - **Caching**: catalog pages use `export const revalidate = 60`, so `npm run build` needs a reachable `DATABASE_URL`.
+
+## Auth conventions
+
+- **Scope**: email + password only, with roles `customer` (default) and `admin`. Don't add social login, password reset, 2FA or email verification unless asked.
+- **Role**: `user.role` is a Better Auth `additionalField` with `input: false`, so sign-up can't set it. A hand-added CHECK limits it to `customer`/`admin`. The only way to grant admin is `npm run auth:make-admin`.
+- **Session checks**: use `getSession` / `requireUser(next)` / `requireAdmin()` from `src/lib/session.ts` (server-only). They read the session from the DB on every request, so sign-out and role changes apply immediately.
+- **Where to check**: in each protected page and in every Server Action, never only in a layout or in `src/proxy.ts`. The proxy only checks that a cookie exists. Non-admins get `notFound()` from admin routes.
+- **Mutations**: sign up, sign in and sign out are Server Actions calling `auth.api.*`, which relies on `nextCookies()`. Redirect targets go through `safeRedirect()`.
+- **Keep the catalog static**: never read the session in the root layout or header. Doing so makes every page dynamic and breaks ISR.
 
 ## Environment
 
