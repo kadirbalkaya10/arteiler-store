@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "prisma db seed",
-    "auth:generate": "npx @better-auth/cli@latest generate --config src/lib/auth.ts --output prisma/schema.prisma"
+    "auth:generate": "npx @better-auth/cli@latest generate --config src/lib/auth.ts --output prisma/schema.prisma",
+    "auth:make-admin": "tsx prisma/make-admin.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
