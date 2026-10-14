@@ -131,3 +131,16 @@ export async function getRelatedProducts(product: Product, limit = 4) {
 
   return [...sameCategory, ...others].map(toProduct);
 }
+
+/** Every product with its stock, for the admin stock list. */
+export async function getStockList() {
+  return prisma.product.findMany({
+    select: { slug: true, name: true, stock: true, category: { select: { name: true } } },
+    orderBy: [{ category: { sortOrder: "asc" } }, { name: "asc" }],
+  });
+}
+
+/** Sets a product's stock. Callers must check the admin role first. */
+export async function setProductStock(slug: string, stock: number) {
+  await prisma.product.update({ where: { slug }, data: { stock } });
+}
